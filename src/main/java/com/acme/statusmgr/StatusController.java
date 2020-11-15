@@ -3,10 +3,13 @@ package com.acme.statusmgr;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.acme.statusmgr.beans.ServerStatus;
+import com.acme.statusmgr.beans.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * Controller for all web/REST requests about the status of servers
@@ -33,12 +36,37 @@ public class StatusController {
     protected final AtomicLong counter = new AtomicLong();
 
 
-    
     @RequestMapping("/status")
     public ServerStatus statusRequestHandler(@RequestParam(value="name", defaultValue="Anonymous") String name,
                                              @RequestParam(required = false) List<String> details) {
         System.out.println("***DEBUG INFO***" + details);
         return new ServerStatus(counter.incrementAndGet(),
                             String.format(template, name));
+    }
+
+    @RequestMapping("/status/detailed")
+    public Status detailedStatusRequestHandler(@RequestParam(value="name", defaultValue="Anonymous") String name,
+                                               @RequestParam List<String> details) {
+        System.out.println("***DEBUG INFO***" + details);
+
+        Status status = new ServerStatus(counter.incrementAndGet(),
+                String.format(template, name));
+
+        for (int i = 0; i < details.size(); i++){
+            switch(details.get(i)){
+                case "operations":
+                    status = new OperationalDecorator(status);
+                    break;
+                case "extensions":
+                    status = new ExtensionsDecorator(status);
+                    break;
+                case "memory":
+                    status = new MemoryDecorator(status);
+                    break;
+                default:
+                    throw new BadRequestException();
+            }
+        }
+        return status;
     }
 }

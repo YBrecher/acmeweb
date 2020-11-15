@@ -13,7 +13,7 @@ public class ServerManager {
      * @return a descriptive string about the servers status
      */
     static public String getCurrentServerStatus() {
-        return "up";  // The server is up
+        return "up ";  // The server is up
     }
 
     /**
@@ -24,4 +24,23 @@ public class ServerManager {
     {
         return true;
     }
+
+    /**
+     * Get the operational status of this server
+     * @return a descriptive string about the servers operational status
+     */
+    static public String getOperationalStatus(){return "and is operating normally ";}
+
+    /**
+     * Get the status of this server's memory
+     * @return a descriptive string about the servers memory status
+     */
+    static public String getMemoryStatus(){return "and its memory is running low ";}
+
+    /**
+     * Get the status of this server's extensions
+     * @return a descriptive string about the servers extensions
+     */
+    static public String getExtensionsStatus(){return "and is using these extensions -" +
+            " [Hypervisor, Kubernetes, RAID-6] ";}
 }

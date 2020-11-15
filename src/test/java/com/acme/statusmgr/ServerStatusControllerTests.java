@@ -15,6 +15,7 @@
  */
 package com.acme.statusmgr;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,7 +41,7 @@ public class ServerStatusControllerTests {
     public void noParamGreetingShouldReturnDefaultMessage() throws Exception {
 
         this.mockMvc.perform(get("/server/status")).andDo(print()).andExpect(status().isOk())
-                .andExpect(jsonPath("$.statusDesc").value("Server is up"));
+                .andExpect(jsonPath("$.statusDesc").value("Server is up "));
     }
 
     @Test
@@ -49,6 +50,42 @@ public class ServerStatusControllerTests {
         this.mockMvc.perform(get("/server/status").param("name", "RebYid"))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contentHeader").value("Server Status requested by RebYid"));
+    }
+
+    @Test
+    public void withParamShouldReturnTailored_Basic_Mem_Op_Ext() throws Exception {
+        this.mockMvc.perform(get("/server/status/detailed?details=memory,operations,extensions"))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusDesc").value("Server is up and its memory is running low" +
+                        " and is operating normally and is using these extensions - [Hypervisor, Kubernetes, RAID-6] "));
+
+    }
+
+    @Test
+    public void withParamShouldReturnTailored_Basic_Mem_Op_Mem() throws Exception {
+        this.mockMvc.perform(get("/server/status/detailed?details=memory,operations,memory"))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$.statusDesc").value("Server is up and its memory is running low" +
+                        " and is operating normally and its memory is running low "));
+
+    }
+
+    @Test
+    public void withParamShouldReturnTailored_Name_Basic_Mem_Op() throws Exception {
+        this.mockMvc.perform(get("/server/status/detailed?details=memory,operations&name=yaakov"))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(jsonPath("$.contentHeader").value("Server Status requested by yaakov"))
+                .andExpect(jsonPath("$.statusDesc").value("Server is up and its memory is running low" +
+                        " and is operating normally "));
+
+    }
+
+    @Test
+    public void withBadRequestShouldReturnException() throws Exception {
+        this.mockMvc.perform(get("/server/status/detailed?details=memory,operations,junkERROR"))
+                .andDo(print()).andExpect(status().isBadRequest())
+                .andExpect(status().reason(is("Invalid details option")));
+
     }
 
 }
