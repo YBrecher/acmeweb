@@ -36,7 +36,6 @@ public class StatusController {
     protected final AtomicLong counter = new AtomicLong();
 
 
-
     @RequestMapping("/status")
     public ServerStatus statusRequestHandler(@RequestParam(value="name", defaultValue="Anonymous") String name,
                                              @RequestParam(required = false) List<String> details) {
@@ -70,6 +69,4 @@ public class StatusController {
         }
         return status;
     }
-
 }
-
