@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.acme.statusmgr.beans.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * Controller for all web/REST requests about the status of servers
@@ -61,6 +64,8 @@ public class StatusController {
                 case "memory":
                     status = new MemoryDecorator(status);
                     break;
+                default:
+                    throw new BadRequestException();
             }
         }
 
@@ -68,3 +73,4 @@ public class StatusController {
     }
 
 }
+
