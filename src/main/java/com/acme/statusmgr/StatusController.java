@@ -68,7 +68,6 @@ public class StatusController {
                     throw new BadRequestException();
             }
         }
-
         return status;
     }
 
